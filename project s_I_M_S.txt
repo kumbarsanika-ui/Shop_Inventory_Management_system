@@ -1,0 +1,832 @@
+Build a complete, professional, scalable full-stack application using:
+
+* Frontend: React.js
+* Backend: Node.js
+* API Framework: Express.js
+* Database: MySQL
+* API Testing: Postman
+* Architecture: MVC + Service Layer + Repository/Data Access Layer
+* Authentication: JWT
+* Password Security: bcrypt
+* Authorization: Role-Based Access Control (RBAC)
+
+The application must be beginner-friendly but follow production-style architecture and coding practices.
+
+==================================================
+
+1. ARCHITECTURE
+   ==================================================
+
+Follow this backend architecture:
+
+Client
+↓
+React
+↓
+REST API
+↓
+Express Routes
+↓
+Middleware
+↓
+Controller
+↓
+Service
+↓
+Repository
+↓
+MySQL
+↓
+Repository
+↓
+Service
+↓
+Controller
+↓
+JSON Response
+
+IMPORTANT:
+
+* Routes handle endpoint definitions.
+* Controllers handle HTTP request and response.
+* Services contain business logic.
+* Repositories contain database queries.
+* Models represent database entities/data structures.
+* Middleware handles authentication, authorization, validation and errors.
+* Controllers must NOT contain SQL queries.
+* Services must NOT directly handle req/res.
+* Repositories must NOT contain business logic.
+* Use async/await.
+* Use centralized error handling.
+* Use reusable utilities.
+* Use environment variables.
+* Never hard-code credentials.
+* Use parameterized SQL queries.
+* Use MySQL transactions for multi-table operations.
+
+==================================================
+2. BACKEND PROJECT STRUCTURE
+============================
+
+server/
+│
+├── config/
+│   ├── database.js
+│   └── env.js
+│
+├── models/
+│   ├── User.js
+│   └── [module models]
+│
+├── controllers/
+│   ├── authController.js
+│   └── [module controllers]
+│
+├── services/
+│   ├── authService.js
+│   └── [module services]
+│
+├── repositories/
+│   ├── userRepository.js
+│   └── [module repositories]
+│
+├── routes/
+│   ├── authRoutes.js
+│   └── [module routes]
+│
+├── middleware/
+│   ├── authMiddleware.js
+│   ├── roleMiddleware.js
+│   ├── validationMiddleware.js
+│   └── errorMiddleware.js
+│
+├── validators/
+│   └── [validation files]
+│
+├── utils/
+│   ├── response.js
+│   ├── pagination.js
+│   └── logger.js
+│
+├── app.js
+└── server.js
+
+==================================================
+3. FRONTEND STRUCTURE
+=====================
+
+client/
+└── src/
+├── components/
+├── pages/
+├── layouts/
+├── routes/
+├── services/
+│   └── api.js
+├── hooks/
+├── context/
+├── utils/
+├── assets/
+├── App.jsx
+└── main.jsx
+
+Create reusable components for:
+
+* Tables
+* Pagination
+* Search
+* Filters
+* Forms
+* Modal dialogs
+* Loading states
+* Error states
+* Confirmation dialogs
+* Navigation
+* Sidebar
+* Dashboard cards
+
+==================================================
+4. REST API REQUIREMENTS
+========================
+
+Every major module must expose REST APIs.
+
+Use:
+
+GET
+POST
+PUT
+PATCH
+DELETE
+
+Example:
+
+GET    /api/products
+GET    /api/products/:id
+POST   /api/products
+PUT    /api/products/:id
+PATCH  /api/products/:id
+DELETE /api/products/:id
+
+Every listing API must support:
+
+* Pagination
+* Search
+* Filtering
+* Sorting
+
+Example:
+
+GET /api/products?page=1&limit=10&search=phone&category=Electronics&status=active&sortBy=created_at&sortOrder=desc
+
+Pagination response:
+
+{
+"success": true,
+"message": "Products retrieved successfully",
+"data": [],
+"pagination": {
+"page": 1,
+"limit": 10,
+"total": 100,
+"totalPages": 10
+}
+}
+
+==================================================
+5. API DOCUMENTATION
+====================
+
+Create complete API documentation.
+
+Create:
+
+docs/API_DOCUMENTATION.md
+
+For every API document:
+
+* HTTP method
+* Endpoint
+* Description
+* Authentication requirement
+* Required role
+* Request parameters
+* Query parameters
+* Request body
+* Success response
+* Error response
+* HTTP status codes
+* Example request
+
+Example:
+
+GET /api/products
+
+Description:
+Retrieve paginated products.
+
+Query Parameters:
+
+page
+limit
+search
+category
+status
+sortBy
+sortOrder
+
+==================================================
+6. POSTMAN COLLECTION
+=====================
+
+Create a complete Postman collection for ALL APIs.
+
+Create:
+
+postman/
+└── [project-name].postman_collection.json
+
+The Postman collection must include folders for:
+
+01 - Authentication
+02 - Users
+03 - Dashboard
+04 - Products
+05 - Categories
+06 - Customers
+07 - Suppliers
+08 - Inventory
+09 - Sales
+10 - Purchases
+11 - Reports
+
+Only include folders relevant to the selected project.
+
+Every API endpoint must be included.
+
+Include requests for:
+
+* Register
+* Login
+* Logout
+* Create
+* Get all
+* Get by ID
+* Update
+* Patch
+* Delete
+* Search
+* Filter
+* Pagination
+* Sorting
+* Dashboard
+* Reports
+
+Create a Postman environment:
+
+postman/
+└── environment.json
+
+Variables:
+
+baseUrl
+token
+userId
+productId
+categoryId
+customerId
+supplierId
+
+Use:
+
+Authorization: Bearer {{token}}
+
+For login, automatically save the JWT token into the Postman environment using a test script.
+
+Example:
+
+pm.environment.set("token", pm.response.json().data.token);
+
+Add basic Postman tests for:
+
+* HTTP status code
+* success field
+* response body
+* authentication
+* pagination
+* required fields
+
+==================================================
+7. MYSQL DATABASE
+=================
+
+Create a complete MySQL database.
+
+Create:
+
+database/
+├── schema.sql
+├── seed.sql
+└── README.md
+
+schema.sql must contain:
+
+* CREATE DATABASE
+* CREATE TABLE
+* Primary keys
+* Foreign keys
+* Unique constraints
+* Indexes
+* NOT NULL constraints
+* Default values
+* created_at
+* updated_at
+
+Use proper relationships.
+
+Do not use MongoDB.
+
+Use MySQL only.
+
+==================================================
+8. DUMMY MYSQL DATA
+===================
+
+The application must work immediately using dummy data.
+
+Create realistic seed data.
+
+seed.sql should contain:
+
+* Roles
+* Users
+* Admin account
+* Manager account
+* Staff account
+* Main application records
+* Related records
+* Sample transactions where applicable
+
+Use realistic but fictional data.
+
+Provide demo login credentials in:
+
+README.md
+
+Example:
+
+Admin:
+email: [admin@example.com](mailto:admin@example.com)
+password: Admin@123
+
+Manager:
+email: [manager@example.com](mailto:manager@example.com)
+password: Manager@123
+
+Staff:
+email: [staff@example.com](mailto:staff@example.com)
+password: Staff@123
+
+Passwords stored in the actual database must be bcrypt hashes.
+
+==================================================
+9. AUTHENTICATION AND RBAC
+==========================
+
+Implement:
+
+* Register
+* Login
+* Logout
+* JWT authentication
+* Password hashing using bcrypt
+* Protected routes
+* Role-based authorization
+
+Roles should be configurable.
+
+Example:
+
+Admin
+Manager
+Staff
+
+Implement middleware:
+
+authenticateToken
+authorizeRoles
+
+Example:
+
+router.post(
+"/products",
+authenticateToken,
+authorizeRoles("admin", "manager"),
+productController.create
+);
+
+==================================================
+10. CRUD REQUIREMENTS
+=====================
+
+Every major module must support:
+
+CREATE
+RETRIEVE
+RETRIEVE BY ID
+UPDATE
+DELETE
+SEARCH
+FILTER
+SORT
+PAGINATION
+
+Add validation for:
+
+* Required fields
+* Email
+* Phone
+* Numeric values
+* Duplicate records
+* Invalid IDs
+* Invalid foreign keys
+
+==================================================
+11. ERROR HANDLING
+==================
+
+Implement centralized error handling.
+
+Use appropriate HTTP status codes:
+
+200 - Success
+201 - Created
+400 - Bad Request
+401 - Unauthorized
+403 - Forbidden
+404 - Not Found
+409 - Conflict
+422 - Validation Error
+500 - Internal Server Error
+
+Use consistent responses.
+
+Success:
+
+{
+"success": true,
+"message": "Operation successful",
+"data": {}
+}
+
+Error:
+
+{
+"success": false,
+"message": "Operation failed",
+"error": "ERROR_CODE"
+}
+
+==================================================
+12. CMS ADMIN PORTAL
+====================
+
+Create a React CMS/Admin portal.
+
+Features:
+
+* Login
+* Dashboard
+* User management
+* Role management
+* Module management
+* CRUD interfaces
+* Search
+* Filter
+* Pagination
+* Sorting
+* Reports
+* Logout
+
+CMS access must depend on user role.
+
+==================================================
+13. DATABASE TRANSACTIONS
+=========================
+
+Use MySQL transactions whenever one business operation modifies multiple tables.
+
+Example:
+
+Creating a sale:
+
+1. Start transaction.
+2. Validate customer.
+3. Validate products.
+4. Validate stock.
+5. Insert sale.
+6. Insert sale items.
+7. Update inventory.
+8. Commit transaction.
+
+If anything fails:
+
+ROLLBACK.
+
+==================================================
+14. SECURITY
+============
+
+Implement:
+
+* bcrypt
+* JWT
+* RBAC
+* Input validation
+* Parameterized queries
+* CORS
+* Environment variables
+* Secure error handling
+* No passwords in API responses
+* No sensitive information in logs
+
+Create:
+
+.env.example
+
+Example:
+
+PORT=5000
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=project_database
+DB_USER=root
+DB_PASSWORD=
+JWT_SECRET=change_this_secret
+
+==================================================
+15. TESTING
+===========
+
+Create basic API tests.
+
+Test:
+
+* Authentication
+* CRUD
+* Search
+* Filtering
+* Pagination
+* Authorization
+* Validation
+* Error handling
+
+All APIs must be testable using Postman.
+
+==================================================
+16. README
+==========
+
+Create a professional README.md containing:
+
+1. Project title
+2. Project description
+3. Features
+4. Technologies
+5. Architecture
+6. Folder structure
+7. Database setup
+8. Environment setup
+9. Installation
+10. Running backend
+11. Running frontend
+12. API documentation
+13. Postman setup
+14. Dummy credentials
+15. Database seed instructions
+16. Screenshots placeholder
+17. Future enhancements
+
+==================================================
+17. DEVELOPMENT ORDER
+=====================
+
+Do NOT generate the entire project in one huge file.
+
+Build step-by-step.
+
+PHASE 1
+Project initialization
+
+PHASE 2
+Folder structure
+
+PHASE 3
+MySQL schema
+
+PHASE 4
+Dummy/seed data
+
+PHASE 5
+Database connection
+
+PHASE 6
+Models
+
+PHASE 7
+Repositories
+
+PHASE 8
+Services
+
+PHASE 9
+Controllers
+
+PHASE 10
+Routes
+
+PHASE 11
+Authentication
+
+PHASE 12
+RBAC
+
+PHASE 13
+Validation
+
+PHASE 14
+CRUD APIs
+
+PHASE 15
+Search/filter/sorting/pagination
+
+PHASE 16
+Postman collection
+
+PHASE 17
+API testing
+
+PHASE 18
+React frontend
+
+PHASE 19
+CMS dashboard
+
+PHASE 20
+Frontend API integration
+
+PHASE 21
+Reports/dashboard
+
+PHASE 22
+Error handling and security review
+
+PHASE 23
+README and documentation
+
+After completing each phase, verify the implementation before moving to the next phase.
+
+==================================================
+18. IMPORTANT
+=============
+
+Generate clean, readable, modular and maintainable code.
+
+Do not put everything in one file.
+
+Do not put SQL queries in controllers.
+
+Do not put business logic in routes.
+
+Do not directly access MySQL from React.
+
+React must communicate only through REST APIs.
+
+The application must initially work with dummy MySQL data.
+
+Later, administrators must be able to add, update and manage data through the CMS.
+
+The final project must include:
+
+* React frontend
+* Node.js backend
+* Express.js REST API
+* MySQL database
+* MVC architecture
+* Service layer
+* Repository layer
+* Authentication
+* RBAC
+* CRUD
+* Search
+* Filter
+* Sorting
+* Pagination
+* Dummy MySQL schema
+* Dummy MySQL seed data
+* Postman collection
+* Postman environment
+* API documentation
+* CMS portal
+* README
+* .env.example
+* Error handling
+* Validation
+* Security
+* Testing
+
+````
+
+### Apply the prompt to your 3 projects
+
+Use the master prompt above and add one of these module specifications at the end.
+
+**Project 1 — `shop-inventory-management`**
+
+```text
+PROJECT MODULES:
+
+1. Authentication
+2. Users & Roles
+3. Dashboard
+4. Products
+5. Categories
+6. Suppliers
+7. Inventory
+8. Stock Transactions
+9. Reports
+
+Product fields:
+id, name, SKU, category_id, description,
+purchase_price, selling_price, quantity,
+minimum_stock, supplier_id, status,
+created_at, updated_at
+
+Include low-stock detection and inventory history.
+````
+
+**Project 2 — `student-feedback-portal`**
+
+```text
+PROJECT MODULES:
+
+1. Authentication
+2. Users & Roles
+3. Dashboard
+4. Students
+5. Teachers
+6. Courses
+7. Subjects
+8. Feedback Questions
+9. Feedback Forms
+10. Feedback Responses
+11. Reports
+
+Feedback should support:
+- Rating questions
+- Multiple-choice questions
+- Text feedback
+- Feedback submission
+- Duplicate submission prevention
+- Teacher-wise reports
+- Subject-wise reports
+- Course-wise reports
+- Average ratings
+```
+
+**Project 3 — `digital-shop-manager-api`**
+
+```text
+PROJECT MODULES:
+
+1. Authentication
+2. Users & Roles
+3. Dashboard
+4. Products
+5. Categories
+6. Customers
+7. Suppliers
+8. Sales
+9. Sale Items
+10. Purchases
+11. Purchase Items
+12. Inventory
+13. Reports
+
+Sales must:
+- Validate stock
+- Create sale
+- Create sale items
+- Reduce inventory
+- Use MySQL transaction
+
+Purchases must:
+- Create purchase
+- Create purchase items
+- Increase inventory
+- Use MySQL transaction
+
+The primary focus should be a professional REST API with complete Postman coverage.
+```
+
+This gives you a consistent architecture across all three projects: **React → REST API → Express → Controller → Service → Repository → MySQL**, with the **SQL schema, seed data, Postman collection/environment, CMS, authentication, RBAC and API documentation** included from the beginning.

@@ -1,0 +1,22 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import * as controller from '../controllers/userController.js';
+import { authenticateToken, authorizeRoles } from '../middleware/authMiddleware.js';
+import { validateBody, validateId } from '../middleware/validationMiddleware.js';
+import { userCreateSchema, userUpdateSchema } from '../models/User.js';
+
+const router = Router();
+router.use(authenticateToken, authorizeRoles('admin'));
+router.get('/', controller.list);
+router.get('/roles', controller.roles);
+router.get('/roles/:id', validateId, controller.getRole);
+router.post('/roles', validateBody(z.object({ name: z.string().trim().min(2).max(40), description: z.string().max(255).nullable().optional() })), controller.createRole);
+router.put('/roles/:id', validateId, validateBody(z.object({ name: z.string().trim().min(2).max(40).optional(), description: z.string().max(255).nullable().optional() })), controller.updateRole);
+router.patch('/roles/:id', validateId, validateBody(z.object({ name: z.string().trim().min(2).max(40).optional(), description: z.string().max(255).nullable().optional() }).refine((value) => Object.keys(value).length > 0)), controller.updateRole);
+router.delete('/roles/:id', validateId, controller.deleteRole);
+router.get('/:id', validateId, controller.get);
+router.post('/', validateBody(userCreateSchema), controller.create);
+router.put('/:id', validateId, validateBody(userCreateSchema), controller.update);
+router.patch('/:id', validateId, validateBody(userUpdateSchema), controller.update);
+router.delete('/:id', validateId, controller.remove);
+export default router;

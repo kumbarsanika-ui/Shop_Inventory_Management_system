@@ -1,0 +1,88 @@
+{
+  "info": {
+    "_postman_id": "b86c6d35-c7de-4a43-ad99-7613c01a6f90",
+    "name": "Shop Inventory Management API",
+    "description": "Complete collection for authentication, administration, catalog, inventory and reporting. Set the supplied environment, then sign in as a demo user.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+  "event": [{
+    "listen": "test",
+    "script": { "type": "text/javascript", "exec": [
+      "pm.test('HTTP status matches request intent', function () { if (pm.request.name.startsWith('Validation:')) pm.expect(pm.response.code).to.eql(422); else pm.expect(pm.response.code).to.be.within(200, 299); });",
+      "if (pm.response.code < 400) {",
+      "  let body; try { body = pm.response.json(); } catch (error) { body = null; }",
+      "  pm.test('Success response has the success field', function () { pm.expect(body).to.be.an('object'); pm.expect(body.success).to.eql(true); });",
+      "  pm.test('Response includes a message', function () { pm.expect(body.message).to.be.a('string'); });",
+      "  if (body && body.pagination) pm.test('Pagination metadata is valid', function () { pm.expect(body.pagination.page).to.be.above(0); pm.expect(body.pagination.limit).to.be.within(1, 100); pm.expect(body.pagination.total).to.be.at.least(0); });",
+      "}"
+    ] }
+  }],
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:5000/api" }],
+  "item": [
+    { "name": "00 - Health", "item": [
+      { "name": "API and database health", "request": { "method": "GET", "auth": { "type": "noauth" }, "url": "{{baseUrl}}/health" } }
+    ] },
+    { "name": "01 - Authentication", "item": [
+      { "name": "Register (staff role only)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"full_name\": \"Sam Park\",\n  \"email\": \"sam@example.com\",\n  \"password\": \"StrongPass9\"\n}" }, "url": "{{baseUrl}}/auth/register" } },
+      { "name": "Login (saves token)", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('Login returns a JWT', function () { const body = pm.response.json(); pm.expect(body.success).to.eql(true); pm.expect(body.data.token).to.be.a('string'); pm.environment.set('token', body.data.token); pm.environment.set('userId', body.data.user.id); });"
+      ] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\"\n}" }, "url": "{{baseUrl}}/auth/login" } },
+      { "name": "Logout", "request": { "method": "POST", "url": "{{baseUrl}}/auth/logout" } }
+    ] },
+    { "name": "02 - Users", "item": [
+      { "name": "List users (search, filter, page, sort)", "request": { "method": "GET", "url": "{{baseUrl}}/users?page=1&limit=10&search=Alex&role=admin&status=active&sortBy=name&sortOrder=asc" } },
+      { "name": "Create user", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const body = pm.response.json(); if (body.data && body.data.id) pm.environment.set('userId', body.data.id);"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"full_name\":\"Sam Park\",\"email\":\"sam@example.com\",\"password\":\"StrongPass9\",\"role_id\":3,\"is_active\":true}" }, "url": "{{baseUrl}}/users" } },
+      { "name": "Get user", "request": { "method": "GET", "url": "{{baseUrl}}/users/{{userId}}" } },
+      { "name": "Replace user (PUT)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"full_name\":\"Sam Park\",\"email\":\"sam@example.com\",\"password\":\"StrongPass9\",\"role_id\":3,\"is_active\":true}" }, "url": "{{baseUrl}}/users/{{userId}}" } },
+      { "name": "Patch user", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"is_active\":false}" }, "url": "{{baseUrl}}/users/{{userId}}" } },
+      { "name": "Delete user", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{userId}}" } },
+      { "name": "List roles", "request": { "method": "GET", "url": "{{baseUrl}}/users/roles" } },
+      { "name": "Get role", "request": { "method": "GET", "url": "{{baseUrl}}/users/roles/{{roleId}}" } },
+      { "name": "Create role", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"auditor\",\"description\":\"Read-only access\"}" }, "url": "{{baseUrl}}/users/roles" } },
+      { "name": "Update role (PUT)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"auditor\",\"description\":\"Read-only access\"}" }, "url": "{{baseUrl}}/users/roles/{{roleId}}" } },
+      { "name": "Patch role", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"description\":\"Updated role description\"}" }, "url": "{{baseUrl}}/users/roles/{{roleId}}" } },
+      { "name": "Delete role", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/roles/{{roleId}}" } }
+    ] },
+    { "name": "03 - Dashboard", "item": [
+      { "name": "Overview metrics", "request": { "method": "GET", "url": "{{baseUrl}}/dashboard" } }
+    ] },
+    { "name": "04 - Products", "item": [
+      { "name": "List products (pagination and sorting)", "request": { "method": "GET", "url": "{{baseUrl}}/products?page=1&limit=10&sortBy=created_at&sortOrder=desc" } },
+      { "name": "Search products", "request": { "method": "GET", "url": "{{baseUrl}}/products?search=notebook&page=1&limit=10" } },
+      { "name": "Filter products (low stock/category/status)", "request": { "method": "GET", "url": "{{baseUrl}}/products?low_stock=true&category_id=1&status=active" } },
+      { "name": "Validation: required fields", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Required product fields are enforced', function () { const body = pm.response.json(); pm.expect(pm.response.code).to.eql(422); pm.expect(body.success).to.eql(false); pm.expect(body.error).to.eql('VALIDATION_ERROR'); });"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{}" }, "url": "{{baseUrl}}/products" } },
+      { "name": "Create product", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const body = pm.response.json(); if (body.data && body.data.id) pm.environment.set('productId', body.data.id);"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Grid Notebook\",\"sku\":\"STN-NBK-999\",\"category_id\":1,\"supplier_id\":1,\"description\":\"A5 grid notebook\",\"purchase_price\":3.25,\"selling_price\":8.5,\"quantity\":12,\"minimum_stock\":5,\"status\":\"active\"}" }, "url": "{{baseUrl}}/products" } },
+      { "name": "Get product", "request": { "method": "GET", "url": "{{baseUrl}}/products/{{productId}}" } },
+      { "name": "Replace product (PUT)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Grid Notebook\",\"sku\":\"STN-NBK-999\",\"category_id\":1,\"supplier_id\":1,\"description\":\"A5 grid notebook, revised\",\"purchase_price\":3.5,\"selling_price\":9,\"quantity\":10,\"minimum_stock\":5,\"status\":\"active\"}" }, "url": "{{baseUrl}}/products/{{productId}}" } },
+      { "name": "Patch product", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"minimum_stock\":6}" }, "url": "{{baseUrl}}/products/{{productId}}" } },
+      { "name": "Delete product", "request": { "method": "DELETE", "url": "{{baseUrl}}/products/{{productId}}" } }
+    ] },
+    { "name": "05 - Categories", "item": [
+      { "name": "List categories (search and pagination)", "request": { "method": "GET", "url": "{{baseUrl}}/categories?page=1&limit=10&search=stationery&sortBy=name&sortOrder=asc" } },
+      { "name": "Create category", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Accessories\",\"description\":\"Small shop accessories\"}" }, "url": "{{baseUrl}}/categories" } },
+      { "name": "Get category", "request": { "method": "GET", "url": "{{baseUrl}}/categories/{{categoryId}}" } },
+      { "name": "Replace category (PUT)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Accessories\",\"description\":\"Updated accessories\"}" }, "url": "{{baseUrl}}/categories/{{categoryId}}" } },
+      { "name": "Patch category", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"description\":\"Updated category description\"}" }, "url": "{{baseUrl}}/categories/{{categoryId}}" } },
+      { "name": "Delete category", "request": { "method": "DELETE", "url": "{{baseUrl}}/categories/{{categoryId}}" } }
+    ] },
+    { "name": "06 - Suppliers", "item": [
+      { "name": "List suppliers (search and pagination)", "request": { "method": "GET", "url": "{{baseUrl}}/suppliers?page=1&limit=10&search=cedar&sortBy=name&sortOrder=asc" } },
+      { "name": "Create supplier", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const body = pm.response.json(); if (body.data && body.data.id) pm.environment.set('supplierId', body.data.id);"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Harbor Supply Co.\",\"contact_name\":\"Alex Kim\",\"email\":\"orders@harbor.example\",\"phone\":\"+1-555-0105\",\"address\":\"Portland, OR\"}" }, "url": "{{baseUrl}}/suppliers" } },
+      { "name": "Get supplier", "request": { "method": "GET", "url": "{{baseUrl}}/suppliers/{{supplierId}}" } },
+      { "name": "Replace supplier (PUT)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Harbor Supply Co.\",\"contact_name\":\"Alex Kim\",\"email\":\"orders@harbor.example\",\"phone\":\"+1-555-0105\",\"address\":\"Seattle, WA\"}" }, "url": "{{baseUrl}}/suppliers/{{supplierId}}" } },
+      { "name": "Patch supplier", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"phone\":\"+1-555-0199\"}" }, "url": "{{baseUrl}}/suppliers/{{supplierId}}" } },
+      { "name": "Delete supplier", "request": { "method": "DELETE", "url": "{{baseUrl}}/suppliers/{{supplierId}}" } }
+    ] },
+    { "name": "07 - Inventory", "item": [
+      { "name": "Current inventory (low stock filter)", "request": { "method": "GET", "url": "{{baseUrl}}/inventory?page=1&limit=10&low_stock=true&search=label" } },
+      { "name": "Movement history", "request": { "method": "GET", "url": "{{baseUrl}}/inventory/transactions?page=1&limit=10&transaction_type=stock_in" } },
+      { "name": "Record stock-in transaction", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"product_id\":1,\"transaction_type\":\"stock_in\",\"quantity\":12,\"reference\":\"PO-2409\",\"notes\":\"Supplier delivery\"}" }, "url": "{{baseUrl}}/inventory/transactions" } },
+      { "name": "Record stock-out transaction", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"product_id\":1,\"transaction_type\":\"stock_out\",\"quantity\":2,\"reference\":\"ISSUE-010\"}" }, "url": "{{baseUrl}}/inventory/transactions" } },
+      { "name": "Set stock count to zero (adjustment)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"product_id\":6,\"transaction_type\":\"adjustment\",\"quantity\":0,\"reference\":\"COUNT-099\",\"notes\":\"Cycle count\"}" }, "url": "{{baseUrl}}/inventory/transactions" } }
+    ] },
+    { "name": "08 - Reports", "item": [
+      { "name": "Inventory and movement report", "request": { "method": "GET", "url": "{{baseUrl}}/dashboard/reports" } }
+    ] }
+  ]
+}

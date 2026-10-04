@@ -1,0 +1,16 @@
+{
+  "name": "shop-inventory-management",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack shop inventory management system",
+  "workspaces": ["server", "client"],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c green,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "test": "npm test -w server",
+    "start": "npm start -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
